@@ -30,8 +30,9 @@ namespace LawlProps
 				return;
 			}
 
-			// Look up the class meta data
-			// See if the specified members exist on it
+			// Verify the class supports the children
+
+			// 
 		}
 	}
 }

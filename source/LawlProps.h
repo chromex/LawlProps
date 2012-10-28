@@ -3,10 +3,19 @@
 
 #include <vector>
 
+#include "LawlProps_Factory.h"
+
 namespace LawlProps
 {
 	class PropertyObject
 	{
+	public:
+
+	protected:
+
+
+	private:
+
 		// pointer to data definition?
 		// virtual getter and setters?
 	};
