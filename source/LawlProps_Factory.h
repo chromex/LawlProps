@@ -11,6 +11,7 @@ namespace LawlProps
 	{
 		size_t offset;
 		size_t type;
+		// Pointer to a method which can create an object of this type
 	};
 
 	struct FactoryClass
@@ -32,6 +33,9 @@ namespace LawlProps
 
 		template< typename ObjType, typename MemberType >
 		static void AddClassMember(ObjType& proto, const char* name, MemberType& member);
+		static bool HasClassMember(size_t type, const std::string& name);
+		template< typename MemberType >
+		static bool HasClassMember(size_t type, const std::string& name);
 
 		template< typename MemberType, typename ObjType >
 		static MemberType& Get(ObjType* obj, const char* name);
@@ -40,16 +44,22 @@ namespace LawlProps
 		static void Set(ObjType* obj, const char* name, const MemberType& value);
 
 		static std::string TypeName(size_t type);
-
+		static size_t TypeID(const std::string& name);
+		static std::string Demangle(const char* name);
+		static bool HasType(const std::string& name);
+		template< typename ObjType >
+		static bool HasType();
+		
 	private:
 		// Helpers
 		std::string _ToString() const;
 		void _AddClassMember(const std::string& className, const std::string& propertyName, size_t offset, size_t propertyType);
 
 		FactoryClass* AddOrCreateClass(const std::string& className);
+		FactoryClass* GetClass(size_t type);
 		size_t GetPropertyOffset(size_t classType, size_t memberType, const std::string& propertyName) const;
-		static std::string Demangle(const char* name);
-		size_t TypeID(const std::string& name);
+		size_t _TypeID(const std::string& name);
+		bool _HasType(const std::string& name) const;
 
 		// State
 		typedef std::map<size_t, FactoryClass*> FactoryClassMap;
@@ -77,8 +87,20 @@ namespace LawlProps
 			Demangle(typeid(ObjType).name()),
 			name,
 			(size_t)((const char*)&member - (const char*)&proto),
-			Inst().TypeID(Demangle(typeid(MemberType).name()))
+			Inst()._TypeID(Demangle(typeid(MemberType).name()))
 		);
+	}
+
+	template< typename MemberType >
+	bool Factory::HasClassMember(size_t type, const std::string& name)
+	{
+		FactoryClass* fc = Inst().GetClass(type);
+
+		FactoryClass::PropertyMap::const_iterator entry = fc->properties.find(name);
+		if(entry == fc->properties.end())
+			return false;
+
+		return entry->second.type == Inst()._TypeID(Demangle(typeid(MemberType).name()));
 	}
 
 	template< typename MemberType, typename ObjType >
@@ -91,8 +113,8 @@ namespace LawlProps
 	MemberType& Factory::Get(ObjType* obj, const char* name)
 	{
 		size_t offset = Inst().GetPropertyOffset(
-			Inst().TypeID(Demangle(typeid(ObjType).name())),
-			Inst().TypeID(Demangle(typeid(MemberType).name())),
+			Inst()._TypeID(Demangle(typeid(ObjType).name())),
+			Inst()._TypeID(Demangle(typeid(MemberType).name())),
 			name
 		);
 
@@ -109,12 +131,18 @@ namespace LawlProps
 	void Factory::Set(ObjType* obj, const char* name, const MemberType& value)
 	{
 		size_t offset = Inst().GetPropertyOffset(
-			Inst().TypeID(Demangle(typeid(ObjType).name())),
-			Inst().TypeID(Demangle(typeid(MemberType).name())),
+			Inst()._TypeID(Demangle(typeid(ObjType).name())),
+			Inst()._TypeID(Demangle(typeid(MemberType).name())),
 			name
 		);
 
 		*((MemberType*)((const char*)obj + offset)) = value;
+	}
+
+	template< typename ObjType >
+	bool Factory::HasType()
+	{
+		return Inst()._HasType(Demangle(typeid(ObjType).name()));
 	}
 }
 

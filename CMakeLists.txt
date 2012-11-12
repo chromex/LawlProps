@@ -18,6 +18,7 @@ set (${PROJECT_NAME}_INC
 	"test/Component.h"
 	"test/GameObject.h"
 	"test/Init.h"
+	"test/Vec3.h"
 )
 
 add_library(LawlJSON STATIC IMPORTED)

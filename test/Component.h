@@ -8,6 +8,7 @@ class Component
 public:
 	Component();
 	virtual ~Component();
+	static void Register();
 
 	void Print(int depth);
 

@@ -7,25 +7,18 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	cout << "--> Testing LawlProps <--" << endl << endl;
+	cout << "--> Testing LawlProps <--" << endl;
 
 	InitFactory();
 
-	cout << "+ Factory Initialized +" << endl;
-
 	cout << LawlProps::Factory::ToString();
 
-	const char* testJSON = "{\"Class\": \"GameObject\", \"Name\": \"Root\", \"ID\": 54 }";
-	cout << "+ Test Data +" << endl;
+	const char* testJSON = "{\"Class\":\"GameObject\",\"Name\":\"Root\",\"Enabled\":true,\"ID\":54,\"Position\":{\"Class\":\"vec3\",\"X\":1,\"Y\":2,\"Z\":3}}";
+	cout << endl << "--> Test Data <--" << endl;
 	cout << testJSON << endl;
 
-	LawlProps::PropertyObjectVec objs;
-	LawlProps::Load(testJSON, objs);
-	for(LawlProps::PropertyObjectVec::iterator obj = objs.begin(); obj != objs.end(); ++obj)
-	{
-		GameObject* go = (GameObject*)(*obj);
-		go->Print(0);
-	}
+	GameObject* root = LawlProps::Load<GameObject>(testJSON);
+	root->Print(0);
 
-	cout << endl << "--> Test Complete <--" << endl;
+	cout << endl << endl << "--> Test Complete <--" << endl;
 }

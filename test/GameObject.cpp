@@ -9,6 +9,7 @@ using namespace std;
 GameObject::GameObject()
 	: _name("GameObject")
 	, _id(-1)
+	, _pos(0.f)
 {}
 
 GameObject::~GameObject()
@@ -30,16 +31,26 @@ void GameObject::Register()
 {
 	GameObject temp;
 
+	LawlProps::AddClassMember(temp, "Enabled", temp._enabled);
 	LawlProps::AddClassMember(temp, "Name", temp._name);
 	LawlProps::AddClassMember(temp, "ID", temp._id);
+	LawlProps::AddClassMember(temp, "Position", temp._pos);
+}
+
+void PrintTabs(int num)
+{
+	for(int idx = 0; idx < num; ++idx)
+		cout << "  ";
 }
 
 void GameObject::Print(int depth)
 {
-	for(int idx = 0; idx < depth; ++idx)
-		cout << "  ";
+	PrintTabs(depth); cout << _name << " (" << endl;
 
-	cout << _name << " (" << endl;
+	PrintTabs(depth+1); cout << "Enabled: " << _enabled << endl;
+	PrintTabs(depth+1); cout << "ID: " << _id << endl;
+	PrintTabs(depth+1); cout << "Name: " << _name << endl;
+	//PrintTabs(depth+1); cout << "Position: " << _pos << endl;
 
 	for(ComponentVec::iterator ptr = _components.begin(); ptr != _components.end(); ++ptr)
 	{
@@ -51,8 +62,5 @@ void GameObject::Print(int depth)
 		(*ptr)->Print(depth+1);
 	}
 
-	for(int idx = 0; idx < depth; ++idx)
-		cout << "  ";
-
-	cout << ")" << endl;
+	PrintTabs(depth); cout << ")" << endl;
 }

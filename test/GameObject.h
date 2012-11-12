@@ -1,6 +1,9 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
+#include "../source/LawlProps.h"
+#include "Vec3.h"
+
 #include <vector>
 #include <string>
 
@@ -23,6 +26,8 @@ private:
 	std::string _name;
 	GameObjectVec _children;
 	ComponentVec _components;
+	vec3 _pos;
+	bool _enabled;
 };
 
 #endif

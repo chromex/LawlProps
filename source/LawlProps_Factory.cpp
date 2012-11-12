@@ -25,15 +25,29 @@ namespace LawlProps
 		return Inst()._ToString();
 	}
 
+	bool Factory::HasClassMember(size_t type, const std::string& name)
+	{
+		FactoryClass* fc = Inst().GetClass(type);
+		return fc->properties.find(name) != fc->properties.end();
+	}
+
 	FactoryClass* Factory::AddOrCreateClass(const std::string& className)
 	{
-		size_t type = TypeID(className);
+		size_t type = _TypeID(className);
 
 		if(_classMap.end() == _classMap.find(type))
 		{
 			_classMap[type] = new FactoryClass;
 			_classMap[type]->name = className;
 		}
+
+		return _classMap[type];
+	}
+
+	FactoryClass* Factory::GetClass(size_t type)
+	{
+		if(_classMap.end() == _classMap.find(type))
+			return 0;
 
 		return _classMap[type];
 	}
@@ -64,7 +78,7 @@ namespace LawlProps
 
 		for(PropertyMap::const_iterator property = properties.begin(); property != properties.end(); ++property)
 		{
-			ss << "-- " << property->second.type << " " << property->first << "\n";
+			ss << "-- " << Factory::TypeName(property->second.type) << " " << property->first << "\n";
 		}
 
 		return ss.str();
@@ -85,6 +99,11 @@ namespace LawlProps
 
 	size_t Factory::TypeID(const std::string& name)
 	{
+		return Inst()._TypeID(name);
+	}
+
+	size_t Factory::_TypeID(const std::string& name)
+	{
 		static size_t currentID = 0;
 		if(_typeIDs.end() == _typeIDs.find(name))
 		{
@@ -92,6 +111,16 @@ namespace LawlProps
 			++currentID;
 		}
 		return _typeIDs[name];
+	}
+
+	bool Factory::HasType(const std::string& name)
+	{
+		return Inst()._HasType(name);
+	}
+
+	bool Factory::_HasType(const std::string& name) const
+	{
+		return _typeIDs.end() != _typeIDs.find(name);
 	}
 
 	size_t Factory::GetPropertyOffset(size_t classType, size_t memberType, const std::string& propertyName) const
