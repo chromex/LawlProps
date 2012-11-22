@@ -1,7 +1,8 @@
 #include "GameObject.h"
 #include "Component.h"
+
 #include "../source/LawlProps.h"
-#include <stddef.h>
+using namespace LawlProps;
 
 #include <iostream>
 using namespace std;
@@ -30,11 +31,10 @@ GameObject::~GameObject()
 void GameObject::Register()
 {
 	GameObject temp;
-
-	LawlProps::AddClassMember(temp, "Enabled", temp._enabled);
-	LawlProps::AddClassMember(temp, "Name", temp._name);
-	LawlProps::AddClassMember(temp, "ID", temp._id);
-	LawlProps::AddClassMember(temp, "Position", temp._pos);
+	TypeMeta<GameObject>::AddMember("Enabled", temp, temp._enabled);
+	TypeMeta<GameObject>::AddMember("Name", temp, temp._name);
+	TypeMeta<GameObject>::AddMember("ID", temp, temp._id);
+	TypeMeta<GameObject>::AddMember("Position", temp, temp._pos);
 }
 
 void PrintTabs(int num)

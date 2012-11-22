@@ -113,6 +113,12 @@ namespace LawlProps
 		ParseJSON(data, results);
 		return Parse<T>(results);
 	}
+
+	template< typename ObjType, typename MemberType >
+	void AddClassMember(ObjType& proto, const char* name, MemberType& member)
+	{
+		Factory::AddClassMember(proto, name, member);
+	}
 }
 
 #endif

@@ -2,23 +2,42 @@
 using namespace std;
 
 #include "../source/LawlProps.h"
+using namespace LawlProps;
+
 #include "GameObject.h"
-#include "Init.h"
+#include "Component.h"
+#include "Vec3.h"
+
+#define REDCOLOR "\033[1;31m"
+#define GREENCOLOR "\033[1;32m"
+#define CLEARCOLOR "\033[0m"
 
 int main(int argc, char** argv)
 {
-	cout << "--> Testing LawlProps <--" << endl;
+	cout << "[" << REDCOLOR << "Testing LawlProps" << CLEARCOLOR << "]" << endl;
 
-	InitFactory();
+	GameObject::Register();
+	Component::Register();
+	{
+		vec3 temp;
+		TypeMeta<vec3>::AddMember("X", temp, temp.x);
+		TypeMeta<vec3>::AddMember("Y", temp, temp.y);
+		TypeMeta<vec3>::AddMember("Z", temp, temp.z);
+	}
 
-	cout << LawlProps::Factory::ToString();
+	cout << "Types Loaded..." << endl;
+
+	cout << "[" << GREENCOLOR << "Type Definitions" << CLEARCOLOR << "]" << endl;
+
+	cout << TypeStore::Instance().ToString();
+
+	cout << "[" << GREENCOLOR << "Test Load" << CLEARCOLOR << "]" << endl;
 
 	const char* testJSON = "{\"Class\":\"GameObject\",\"Name\":\"Root\",\"Enabled\":true,\"ID\":54,\"Position\":{\"Class\":\"vec3\",\"X\":1,\"Y\":2,\"Z\":3}}";
-	cout << endl << "--> Test Data <--" << endl;
 	cout << testJSON << endl;
 
-	GameObject* root = LawlProps::Load<GameObject>(testJSON);
-	root->Print(0);
+	//GameObject* root = LawlProps::Load<GameObject>(testJSON);
+	//root->Print(0);
 
-	cout << endl << endl << "--> Test Complete <--" << endl;
+	cout << "[" << REDCOLOR << "Test Complete" << CLEARCOLOR << "]" << endl;
 }

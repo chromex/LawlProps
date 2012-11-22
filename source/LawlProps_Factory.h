@@ -1,9 +1,7 @@
 #ifndef LAWLPROPS_FACTORY_H
 #define LAWLPROPS_FACTORY_H
 
-#include <string>
-#include <map>
-#include <typeinfo>
+#include "LawlProps_Type.h"
 
 namespace LawlProps
 {
@@ -45,7 +43,6 @@ namespace LawlProps
 
 		static std::string TypeName(size_t type);
 		static size_t TypeID(const std::string& name);
-		static std::string Demangle(const char* name);
 		static bool HasType(const std::string& name);
 		template< typename ObjType >
 		static bool HasType();
@@ -75,19 +72,13 @@ namespace LawlProps
 	};
 
 	template< typename ObjType, typename MemberType >
-	void AddClassMember(ObjType& proto, const char* name, MemberType& member)
-	{
-		Factory::AddClassMember(proto, name, member);
-	}
-
-	template< typename ObjType, typename MemberType >
 	void Factory::AddClassMember(ObjType& proto, const char* name, MemberType& member)
 	{
 		Inst()._AddClassMember(
-			Demangle(typeid(ObjType).name()),
+			TypeMeta<ObjType>::Name(),
 			name,
 			(size_t)((const char*)&member - (const char*)&proto),
-			Inst()._TypeID(Demangle(typeid(MemberType).name()))
+			TypeMeta<MemberType>::ID()
 		);
 	}
 
@@ -100,21 +91,15 @@ namespace LawlProps
 		if(entry == fc->properties.end())
 			return false;
 
-		return entry->second.type == Inst()._TypeID(Demangle(typeid(MemberType).name()));
-	}
-
-	template< typename MemberType, typename ObjType >
-	MemberType& Get(ObjType* obj, const char* name)
-	{
-		return Factory::Get(obj, name);
+		return entry->second.type == TypeMeta<MemberType>::ID();
 	}
 
 	template< typename MemberType, typename ObjType >
 	MemberType& Factory::Get(ObjType* obj, const char* name)
 	{
 		size_t offset = Inst().GetPropertyOffset(
-			Inst()._TypeID(Demangle(typeid(ObjType).name())),
-			Inst()._TypeID(Demangle(typeid(MemberType).name())),
+			TypeMeta<ObjType>::ID(),
+			TypeMeta<MemberType>::ID(),
 			name
 		);
 
@@ -122,17 +107,11 @@ namespace LawlProps
 	}
 
 	template< typename MemberType, typename ObjType >
-	void Set(ObjType* obj, const char* name, const MemberType& value)
-	{
-		Factory::Set(obj, name, value);
-	}
-
-	template< typename MemberType, typename ObjType >
 	void Factory::Set(ObjType* obj, const char* name, const MemberType& value)
 	{
 		size_t offset = Inst().GetPropertyOffset(
-			Inst()._TypeID(Demangle(typeid(ObjType).name())),
-			Inst()._TypeID(Demangle(typeid(MemberType).name())),
+			TypeMeta<ObjType>::ID(),
+			TypeMeta<MemberType>::ID(),
 			name
 		);
 
@@ -142,7 +121,7 @@ namespace LawlProps
 	template< typename ObjType >
 	bool Factory::HasType()
 	{
-		return Inst()._HasType(Demangle(typeid(ObjType).name()));
+		return Inst()._HasType(TypeMeta<ObjType>::Name());
 	}
 }
 
