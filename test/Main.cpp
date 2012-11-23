@@ -36,8 +36,12 @@ int main(int argc, char** argv)
 	const char* testJSON = "{\"Class\":\"GameObject\",\"Name\":\"Root\",\"Enabled\":true,\"ID\":54,\"Position\":{\"Class\":\"vec3\",\"X\":1,\"Y\":2,\"Z\":3}}";
 	cout << testJSON << endl;
 
-	//GameObject* root = LawlProps::Load<GameObject>(testJSON);
-	//root->Print(0);
+	GameObject* root = Load<GameObject>(testJSON);
+	root->Print(0);
+
+	cout << "[" << GREENCOLOR << "Test Save" << CLEARCOLOR << "]" << endl;
+
+	cout << Save(root) << endl;
 
 	cout << "[" << REDCOLOR << "Test Complete" << CLEARCOLOR << "]" << endl;
 }

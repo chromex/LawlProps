@@ -4,8 +4,6 @@ project (LawlProps)
 
 set (${PROJECT_NAME}_SRC
 	"source/LawlProps.cpp"
-	"source/LawlProps_Factory.cpp"
-	"source/LawlProps_Type.cpp"
 	"test/Component.cpp"
 	"test/GameObject.cpp"
 	"test/Main.cpp"
@@ -13,9 +11,6 @@ set (${PROJECT_NAME}_SRC
 
 set (${PROJECT_NAME}_INC
 	"source/LawlProps.h"
-	"source/LawlProps_Factory.h"
-	"source/LawlProps_Settings.h"
-	"source/LawlProps_Type.h"
 	"test/Component.h"
 	"test/GameObject.h"
 	"test/Vec3.h"

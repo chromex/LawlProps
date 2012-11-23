@@ -27,6 +27,7 @@ private:
 	GameObjectVec _children;
 	ComponentVec _components;
 	vec3 _pos;
+	vec3* _ptrPos;
 	bool _enabled;
 };
 

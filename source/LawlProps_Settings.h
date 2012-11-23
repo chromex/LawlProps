@@ -1,5 +1,0 @@
-#ifndef LAWLPROPS_SETTINGS_H
-#define LAWLPROPS_SETTINGS_H
-
-
-#endif
