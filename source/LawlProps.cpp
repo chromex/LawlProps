@@ -1,6 +1,12 @@
 #include "LawlProps.h"
 
+#ifndef _WIN32
 #include <cxxabi.h>
+//#else
+//#include <Windows.h>
+//#include <DbgHelp.h>
+#endif
+
 #include <stdlib.h>
 #include <sstream>
 
@@ -12,16 +18,30 @@ namespace LawlProps
 		return store;
 	}
 
-	// A gcc specific solution
-	// http://stackoverflow.com/questions/281818/unmangling-the-result-of-stdtype-infoname
 	std::string TypeStore::Demangle(const char* name)
 	{
+#ifndef _WIN32
+		// A gcc specific solution
+		// http://stackoverflow.com/questions/281818/unmangling-the-result-of-stdtype-infoname
 		int status = -4;
 		char* res = abi::__cxa_demangle(name, NULL, NULL, &status);
 		const char* const demangled_name = (status==0)?res:name;
 		std::string ret_val(demangled_name);
 		free(res);
 		return ret_val;
+#else
+		/*
+		std::string ret = name;
+		char* undecoratedName = new char[strlen(name)+2];
+		if(UnDecorateSymbolName(name, undecoratedName, strlen(name)+2, UNDNAME_NAME_ONLY))
+		{
+			ret = undecoratedName;
+		}
+		delete[] undecoratedName;
+		return ret;
+		*/
+		return name;
+#endif
 	}
 
 	size_t TypeStore::UniqueID(const std::string& name)
@@ -108,6 +128,14 @@ namespace LawlProps
 			void* propPtr = reinterpret_cast<void*>((size_t)ptr + entry->second.offset);
 			size_t propTypeID = entry->second.type->GetID();
 
+			// Pointer
+			if(entry->second.pointer)
+			{
+				void* newPtr = entry->second.type->Instantiate();
+				*((void**)propPtr) = newPtr;
+				propPtr = newPtr;
+			}
+
 			if(property->second.IsNumber())
 			{
 				if(TypeMeta<int>::ID() == propTypeID)
@@ -148,6 +176,10 @@ namespace LawlProps
 				{
 					*((std::string*)propPtr) = property->second.string();
 				}
+				else if(entry->second.type->HasDeserializer())
+				{
+					entry->second.type->Deserialize(property->second.string(), propPtr);
+				}
 				else
 				{
 					// Types don't match
@@ -169,6 +201,15 @@ namespace LawlProps
 		{
 			void* propPtr = reinterpret_cast<void*>((size_t)ptr + entry->second.offset);
 			size_t propID = entry->second.type->GetID();
+
+			// Follow the pointer
+			if(entry->second.pointer)
+			{
+				void* ptr = *((void**)propPtr);
+				if(0 == ptr)
+					continue;
+				propPtr = ptr;
+			}
 
 			if(TypeMeta<int>::ID() == propID)
 			{
@@ -193,6 +234,10 @@ namespace LawlProps
 			else if(TypeMeta<bool>::ID() == propID)
 			{
 				object[entry->first] = (bool)(*((bool*)propPtr));
+			}
+			else if(entry->second.type->HasSerializer())
+			{
+				object[entry->first] = (LJString)(entry->second.type->Serialize(propPtr));
 			}
 			else
 			{
