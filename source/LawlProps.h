@@ -98,6 +98,22 @@ namespace LawlProps
 			pe.pointer = true;
 		}
 
+		template< typename T >
+		static T& Get(const ObjType& obj, const std::string& name)
+		{
+			PropertyMap& properties = Instance()->_properties;
+			PropertyMap::const_iterator entry = properties.find(name);
+			if(properties.end() == entry)
+			{
+				throw std::exception();
+			}
+			if(TypeMeta<T>::Instance()->GetID() != entry->second.type->GetID())
+			{
+				throw std::exception();
+			}
+			return *reinterpret_cast<T*>((size_t)&obj + entry->second.offset);
+		}
+
 		static void SetSerializer(std::string (*serializer)(const ObjType*))
 		{
 			Instance()->_serializer = serializer;
